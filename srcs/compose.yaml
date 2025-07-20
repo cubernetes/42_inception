@@ -1,0 +1,22 @@
+name: inception
+
+networks:
+  wp-net:
+volumes:
+  wp-db:
+  wp-site:
+
+services:
+  nginx:
+    build: nginx
+    volumes: [./nginx/http.d/:/etc/nginx/http.d/]
+    ports: ["443:8443"]
+    networks: [wp-net]
+  wordpress:
+    build: wordpress
+    volumes: [wp-site:<path>]
+    networks: [wp-net]
+  mariadb:
+    build: mariadb
+    volumes: [wp-db:<path>]
+    networks: [wp-net]
