@@ -1,4 +1,4 @@
-FROM alpine:3.21.4
+FROM alpine:3.21.5
 
 RUN apk add --no-cache --virtual .build-deps openssl && \
 		apk add --no-cache nginx && \
