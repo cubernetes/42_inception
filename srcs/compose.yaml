@@ -8,15 +8,24 @@ volumes:
 
 services:
   nginx:
+    container_name: nginx
     build: nginx
     volumes: [./nginx/http.d/:/etc/nginx/http.d/]
-    ports: ["443:8443"]
+    #ports: ["443:8443"]
+    ports: ["8443:8443"]
     networks: [wp-net]
   wordpress:
+    container_name: wordpress
+    depends_on:
+      mariadb:
+        condition: service_started
     build: wordpress
-    volumes: [wp-site:<path>]
+    volumes: [wp-site:/opt]
     networks: [wp-net]
   mariadb:
+    container_name: mariadb
     build: mariadb
-    volumes: [wp-db:<path>]
+    volumes: [wp-db:/var/lib/mysql]
     networks: [wp-net]
+    ports:
+      - "3306:3306"

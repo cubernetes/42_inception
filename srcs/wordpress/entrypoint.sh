@@ -3,7 +3,7 @@
 set -eux
 
 wp core download
-wp config create --dbname=test_db --dbhost=tmp-mariadb:3306 --dbuser=test_user --prompt=dbpass<<'EOPASS'
+wp config create --dbname=test_db --dbhost=mariadb:3306 --dbuser=test_user --prompt=dbpass<<'EOPASS'
 test_password
 EOPASS
 wp db create

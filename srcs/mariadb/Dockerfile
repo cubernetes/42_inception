@@ -42,5 +42,9 @@ EOF
 # default data dir
 VOLUME ["/var/lib/mysql"]
 
+COPY --chmod=755 entrypoint.sh /
+
 # --console not really needed here, but it's a nice explicit way of saying "don't daemonize"
-CMD ["mariadbd-safe", "--console", "--no-defaults", "--bind-address=*", "--init-file=/tmp/init.sql"]
+CMD ["mariadbd-safe", "--no-defaults", "--bind-address=*", "--init-file=/tmp/init.sql"]
+
+ENTRYPOINT ["/entrypoint.sh"]
