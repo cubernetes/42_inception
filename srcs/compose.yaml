@@ -36,8 +36,9 @@ services:
     depends_on: [*db]
   &proxy nginx:
     <<: *base_config
+    environment: {SITE: *site}
     secrets: [tls_cert]
-    build: *proxy
+    build: {context: *proxy, args: {SITE: *site}}
     volumes: [*site_vol]
     ports: ["443:8443"]
     depends_on: [*site]

@@ -18,10 +18,10 @@ re: clean $(ENV)
 	$(MAKE) up
 
 data_dir:
-	$(MKDIR) -p -- "$$HOME/data/wp_db" "$$HOME/data/wp_site"
+	$(MKDIR) -- "$$HOME/data/wp_db" "$$HOME/data/wp_site"
 
 $(ENV): $(ENV_TEMPLATE)
 	@# Render env template. Works with multiline variables as well. Requires the `-z` option to sed.
-	env -i sh -c 'quote () { sed -z '\''s/\n[a-zA-Z_][a-zA-Z0-9_]*=/&"/g; s/\n[a-zA-Z_][a-zA-Z0-9_]*="/"&/g; s/^[a-zA-Z_][a-zA-Z0-9_]*=/&"/; s/\n$$/"\n/g'\''; } && env | quote > "$$ENV" && set -- && while LC_ALL=C IFS= read -r line; do set -- "$$@" -e "$$line"; done < "$$ENV" && set -a && . "$$ENV_TEMPLATE" && env | quote | grep -vFx "$$@" | { sleep .1 && >/dev/null tee "$$ENV"; }'
+	env - ENV="$$ENV" ENV_TEMPLATE="$$ENV_TEMPLATE" sh -c 'quote () { sed -z '\''s/\n[a-zA-Z_][a-zA-Z0-9_]*=/&"/g; s/\n[a-zA-Z_][a-zA-Z0-9_]*="/"&/g; s/^[a-zA-Z_][a-zA-Z0-9_]*=/&"/; s/\n$$/"\n/g'\''; } && env | quote > "$$ENV" && set -- && while LC_ALL=C IFS= read -r line; do set -- "$$@" -e "$$line"; done < "$$ENV" && set -a && . "$$ENV_TEMPLATE" && env | quote | grep -vFx "$$@" | { sleep .1 && >/dev/null tee "$$ENV"; }'
 
 .PHONY: up down clean re data_dir
