@@ -16,6 +16,6 @@ curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pag
 chmod +x /usr/local/bin/wp
 EOF
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint"]
 
 CMD ["php-fpm84", "-F"]

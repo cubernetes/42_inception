@@ -5,19 +5,20 @@ RUN <<EOF
 set -ex
 export DEBIAN_FRONTEND=noninteractive
 
-# -qq is the same as -y but more silent
-apt-get update --fix-missing -qq
-apt-get upgrade -qq
+# `-qq` is the same as `-y` but more silent (only for `apt-get`)
+# When using `apt`, you do need to add an additional `-y`, though
+apt-get update --fix-missing -yqq
+apt-get upgrade -yqq
 
 # ok these -o options might be overkill
 apt-get install \
         -o quiet::NoProgress=true \
         -o Dpkg::Options::="--force-confdef" \
         -o Dpkg::Options::="--force-confold" \
-        -qq \
+        -yqq \
         mariadb-server
-apt-get autoremove -qq
-apt-get clean -qq
+apt-get autoremove -yqq
+apt-get clean -yqq
 
 # sysvinit way, calls /etc/init.d/mariadb under the hood, which in turn calls mariadbd-safe, which in turn calls mariadbd, and then daemonizes
 service mariadb start
@@ -47,4 +48,4 @@ COPY --chmod=755 entrypoint.sh /
 # --console not really needed here, but it's a nice explicit way of saying "don't daemonize"
 CMD ["mariadbd-safe", "--no-defaults", "--bind-address=*", "--init-file=/tmp/init.sql"]
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint"]

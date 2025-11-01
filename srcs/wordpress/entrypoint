@@ -7,6 +7,6 @@ wp config create --dbname=test_db --dbhost=mariadb:3306 --dbuser=test_user --pro
 test_password
 EOPASS
 wp db create
-wp core install --url=localhost --title="WP-CLI" --admin_user=wpcli --admin_password=wpcli --admin_email=info@wp-cli.org
+wp core install --url=tischmid.42.fr --title="WP-CLI" --admin_user=wpcli --admin_password=wpcli --admin_email=info@wp-cli.org
 
 exec "$@"
