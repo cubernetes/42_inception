@@ -21,6 +21,7 @@ RUN apk add --no-cache --virtual .build-deps openssl && \
 
 COPY ./inception.conf /etc/nginx/http.d/default.conf
 
-USER 1000
+# USER 1000
+USER 0
 
 CMD ["nginx", "-g", "daemon off;"]

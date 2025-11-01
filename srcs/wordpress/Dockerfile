@@ -1,8 +1,6 @@
 FROM alpine:3.21.5
 
-WORKDIR /opt
-
-COPY --chmod=755 entrypoint.sh /
+WORKDIR /var/www/html/wordpress/
 
 RUN <<EOF
 set -ex
@@ -15,6 +13,8 @@ ln -sf /usr/bin/php84 /usr/bin/php
 curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x /usr/local/bin/wp
 EOF
+
+COPY --chmod=755 entrypoint /
 
 ENTRYPOINT ["/entrypoint"]
 

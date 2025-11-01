@@ -3,10 +3,24 @@
 set -eux
 
 wp core download
-wp config create --dbname=test_db --dbhost=mariadb:3306 --dbuser=test_user --prompt=dbpass<<'EOPASS'
-test_password
-EOPASS
+wp config create \
+    --dbname="$WP_DB" \
+    --dbhost="$DB:$DB_PORT" \
+    --dbuser="$WP_DB_USER" \
+    --prompt=dbpass<<EOF
+$WP_DB_PW
+EOF
 wp db create
-wp core install --url=tischmid.42.fr --title="WP-CLI" --admin_user=wpcli --admin_password=wpcli --admin_email=info@wp-cli.org
+wp core install \
+    --url="$DOMAIN" \
+    --title="Tischmid's site" \
+    --admin_user="$WP_ADMIN_USER" \
+    --admin_email="$WP_ADMIN_EMAIL" \
+    --skip-email \
+    --prompt=admin_password<<EOF
+$WP_ADMIN_PW
+EOF
+
+unset WP_PW WP_ADMIN_PW
 
 exec "$@"

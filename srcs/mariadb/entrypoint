@@ -1,10 +1,15 @@
 #!/bin/sh
 
-#CREATE DATABASE IF NOT EXISTS test_db;
-install -m=644 -D /dev/stdin /tmp/init.sql << 'EOF'
-CREATE USER IF NOT EXISTS 'test_user'@'%' IDENTIFIED BY 'test_password';
-GRANT ALL PRIVILEGES ON test_db.* TO 'test_user'@'%' WITH GRANT OPTION;
+ESC_WP_USER=$(printf %s "$WP_USER" | sed "s/\\\\/&&/g; s/'/''/g")
+ESC_WP_PW=$(printf %s "$WP_PW" | sed "s/\\\\/&&/g; s/'/''/g")
+
+install -m=644 -D /dev/stdin /tmp/init.sql <<EOF
+CREATE USER IF NOT EXISTS '$ESC_WP_USER'@'%' IDENTIFIED BY '$ESC_WP_PW';
+GRANT ALL PRIVILEGES ON $WP_DB.* TO '$ESC_WP_USER'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 
-exec "$@"
+#chown -R mysql:mysql /var/lib/mysql
+
+(exec "$@")
+tail -f /dev/null

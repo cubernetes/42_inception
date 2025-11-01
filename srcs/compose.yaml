@@ -1,26 +1,39 @@
 name: inception
 
 networks:
-  wp-net:
+  &wp_net wp_net:
+
+x-base_config: &base_config
+  networks: [*wp_net]
+  restart: on-failure
+
+volumes:
+  # assignment requires use to have the volumes in $HOME/data
+  # but a simple bind mount is not copy-once
+  # therefore, we have to use named volumes that behave like bind mounts
+  # if we want to run mariadb-install-db during the image build stage
+  &wp_db wp_db:
+    driver: local
+    driver_opts: { type: none, o: bind, device: $HOME/data/wp_db/ }
+  &wp_site wp_site:
+    driver: local
+    driver_opts: { type: none, o: bind, device: $HOME/data/wp_site/ }
 
 services:
-  nginx:
-    container_name: nginx
-    build: nginx
+  # topologically sorted s.t. YAML anchors work
+  &db mariadb:
+    <<: *base_config
+    environment: [WP_DB, WP_USER, WP_PW]
+    build: *db
+    volumes: [{type: volume, source: *wp_db, target: /var/lib/mysql/}]
+  &site wordpress:
+    <<: *base_config
+    environment: {WP_DB, WP_USERW, DB_PORT, DOMAIN, WP_ADMIN_USER, WP_ADMIN_EMAIL, DB: *db}
+    build: *site
+    volumes: [&site_vol {type: volume, source: *wp_site, target: /var/www/html/wordpress/}]
+    depends_on: [*db]
+  &proxy nginx:
+    <<: *base_config
+    build: *proxy
+    volumes: [*site_vol]
     ports: ["443:8443"]
-    networks: [wp-net]
-  wordpress:
-    container_name: wordpress
-    depends_on:
-      mariadb:
-        condition: service_started
-    build: wordpress
-    volumes: [$HOME/data/wp-site:/opt]
-    networks: [wp-net]
-  mariadb:
-    container_name: mariadb
-    build: mariadb
-    volumes: [$HOME/data/wp-db:/var/lib/mysql]
-    networks: [wp-net]
-    ports:
-      - "3306:3306"
