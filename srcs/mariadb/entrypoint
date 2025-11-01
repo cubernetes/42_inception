@@ -1,4 +1,4 @@
-#! /bin/sh -euv
+#! /bin/sh -eu
 
 # Don't run again
 [ -f /tmp/init.sql ] && exec "$@"

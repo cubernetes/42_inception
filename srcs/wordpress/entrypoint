@@ -1,4 +1,4 @@
-#! /bin/sh -eux
+#! /bin/sh -eu
 
 [ ! -f wp-config-sample.php ] && wp core download
 
