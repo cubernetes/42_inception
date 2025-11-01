@@ -1,6 +1,6 @@
 #! /bin/sh -eux
 
-[ ! -f wp-config-sample.php ] && wp core download --skip-content
+[ ! -f wp-config-sample.php ] && wp core download
 
 if [ ! -f wp-config.php ]; then
     wp config create \

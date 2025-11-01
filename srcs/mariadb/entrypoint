@@ -1,11 +1,11 @@
 #! /bin/sh -euv
 
+# Don't run again
+[ -f /tmp/init.sql ] && exec "$@"
+
 install -m=644 -D /dev/stdin /tmp/init.sql << EOF
 FLUSH PRIVILEGES;
 EOF
-
-# Don't run again
-[ -f /tmp/init.sql ] && exec "$@"
 
 # init.sql ran already
 [ -z "$(mariadb "$WP_DB" 2>&1 </dev/null)" ] && exec "$@"
