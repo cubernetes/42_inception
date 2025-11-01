@@ -2,9 +2,9 @@ MKDIR := mkdir -p
 D := docker
 DC := docker compose
 
-up: | data_dir
+up: | data_dir init_env
 	cd srcs && $(DC) up --remove-orphans --build --detach --force-recreate && $(DC) logs -f
-down: | data_dir
+down: | data_dir init_env
 	cd srcs && $(DC) down --remove-orphans && $(DC) logs -f
 clean: | data_dir
 	$(D) run --workdir="/mnt/" --volume="$$HOME/data/:/mnt/" --rm alpine sh -c 'rm -rf *'
@@ -16,4 +16,4 @@ re: clean init_env
 data_dir:
 	$(MKDIR) -p -- "$$HOME/data/wp_db" "$$HOME/data/wp_site"
 
-.PHONY: up down clean re data_dir
+.PHONY: up down clean re data_dir init_env
