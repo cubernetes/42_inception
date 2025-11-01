@@ -1,26 +1,21 @@
-#!/bin/sh
+#! /bin/sh -eux
 
-set -eux
+[ ! -f wp-config-sample.php ] && wp core download --skip-content
 
-wp core download
-wp config create \
-    --dbname="$WP_DB" \
-    --dbhost="$DB:$DB_PORT" \
-    --dbuser="$WP_DB_USER" \
-    --prompt=dbpass<<EOF
-$WP_DB_PW
-EOF
-wp db create
-wp core install \
-    --url="$DOMAIN" \
-    --title="Tischmid's site" \
-    --admin_user="$WP_ADMIN_USER" \
-    --admin_email="$WP_ADMIN_EMAIL" \
-    --skip-email \
-    --prompt=admin_password<<EOF
-$WP_ADMIN_PW
-EOF
-
-unset WP_PW WP_ADMIN_PW
+if [ ! -f wp-config.php ]; then
+    wp config create \
+        --dbname="$WP_DB" \
+        --dbhost="$DB:$DB_PORT" \
+        --dbuser="$WP_DB_USER" \
+        --prompt=dbpass < /run/secrets/wp_db_pw
+    wp db create
+    wp core install \
+        --url="$DOMAIN" \
+        --title="Tischmid's site" \
+        --admin_user="$WP_ADMIN_USER" \
+        --admin_email="$WP_ADMIN_EMAIL" \
+        --skip-email \
+        --prompt=admin_password < /run/secrets/wp_admin_pw
+fi
 
 exec "$@"

@@ -23,17 +23,26 @@ services:
   # topologically sorted s.t. YAML anchors work
   &db mariadb:
     <<: *base_config
-    environment: [WP_DB, WP_USER, WP_PW]
+    environment: [WP_DB, WP_DB_USER]
+    secrets: [wp_db_pw]
     build: *db
     volumes: [{type: volume, source: *wp_db, target: /var/lib/mysql/}]
   &site wordpress:
     <<: *base_config
     environment: {DOMAIN, DB: *db, DB_PORT, WP_DB, WP_DB_USER, WP_ADMIN_USER, WP_ADMIN_EMAIL}
+    secrets: [wp_db_pw, wp_admin_pw]
     build: *site
     volumes: [&site_vol {type: volume, source: *wp_site, target: /var/www/html/wordpress/}]
     depends_on: [*db]
   &proxy nginx:
     <<: *base_config
+    secrets: [tls_cert]
     build: *proxy
     volumes: [*site_vol]
     ports: ["443:8443"]
+    depends_on: [*site]
+
+secrets:
+  wp_admin_pw: {environment: WP_ADMIN_PW}
+  wp_db_pw: {environment: WP_DB_PW}
+  tls_cert: {environment: TLS_CERT}

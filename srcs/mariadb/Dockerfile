@@ -21,7 +21,7 @@ service mariadb start
 
 # secure installation to remove test DBs and so on
 # blank line REQUIRED
-mariadb-secure-installation <<'EOM'
+mariadb-secure-installation << EOM
 y
 n
 n

@@ -1,15 +1,21 @@
-#!/bin/sh
+#! /bin/sh -euv
 
-ESC_WP_USER=$(printf %s "$WP_USER" | sed "s/\\\\/&&/g; s/'/''/g")
-ESC_WP_PW=$(printf %s "$WP_PW" | sed "s/\\\\/&&/g; s/'/''/g")
-
-install -m=644 -D /dev/stdin /tmp/init.sql <<EOF
-CREATE USER IF NOT EXISTS '$ESC_WP_USER'@'%' IDENTIFIED BY '$ESC_WP_PW';
-GRANT ALL PRIVILEGES ON $WP_DB.* TO '$ESC_WP_USER'@'%' WITH GRANT OPTION;
+install -m=644 -D /dev/stdin /tmp/init.sql << EOF
 FLUSH PRIVILEGES;
 EOF
 
-#chown -R mysql:mysql /var/lib/mysql
+# Don't run again
+[ -f /tmp/init.sql ] && exec "$@"
 
-(exec "$@")
-tail -f /dev/null
+# init.sql ran already
+[ -z "$(mariadb "$WP_DB" 2>&1 </dev/null)" ] && exec "$@"
+
+ESC_WP_DB_USER=$(printf %s "$WP_DB_USER" | sed "s/\\\\/&&/g; s/'/''/g")
+
+cat > /tmp/init.sql << EOF
+CREATE USER IF NOT EXISTS '$ESC_WP_DB_USER'@'%' IDENTIFIED BY '$(sed "s/\\\\/&&/g; s/'/''/g" < /run/secrets/wp_db_pw)';
+GRANT ALL PRIVILEGES ON $WP_DB.* TO '$ESC_WP_DB_USER'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
+
+exec "$@"
